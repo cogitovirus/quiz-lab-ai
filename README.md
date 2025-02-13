@@ -5,7 +5,6 @@ AI-powered quiz generator designed for cloud certification exam preparation. Bui
 
 Tech Stack:
 - Next.js + TypeScript
-- LangChain for AI orchestration
 - Google Gemini API
 
 Features:
