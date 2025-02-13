@@ -1,1 +1,1 @@
-// placeholder
+// src/app/layout.tsx

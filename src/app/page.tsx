@@ -1,1 +1,1 @@
-// placeholder
+// src/app/page.tsx
