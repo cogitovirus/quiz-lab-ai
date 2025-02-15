@@ -1,7 +1,7 @@
-// src/app/lib/services/gemini/client.ts
+// src/app/lib/services/openai/client.ts
 
 // import { QuizConfig, QuizQuestion } from "../../types/quiz";
 
 // export const generateQuestionsFromPrompt = async (config: QuizConfig): Promise<QuizQuestion[]> => {
-//     // Implement Gemini API integration
+//     // Implement opeai API integration
 //   };
