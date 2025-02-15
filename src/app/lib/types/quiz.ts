@@ -2,7 +2,7 @@
 export interface QuizConfig {
     prompt: string;
     difficulty: 'easy' | 'medium' | 'hard';
-    questionCount: number;
+    numQuestions: number;
     questionType: 'multichoice';
   }
   
