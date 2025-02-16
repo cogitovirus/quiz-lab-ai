@@ -1,16 +1,19 @@
+"use client";
+
 import React, { useState } from 'react';
 import { generateQuestionsFromPrompt } from '../../lib/services/openai/client';
 import QuizResults from './QuizResults';
+import { QuizQuestion } from '../../lib/types/quiz';
 
 const QuizGenerator = () => {
   const [prompt, setPrompt] = useState('');
   const [numQuestions, setNumQuestions] = useState(5);
   const [difficulty, setDifficulty] = useState('easy');
-  const [questions, setQuestions] = useState(null);
+  const [questions, setQuestions] = useState<QuizQuestion[] | null>(null);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const config = { prompt, numQuestions, difficulty };
+    const config = { prompt, numQuestions, difficulty, questionType: 'multichoice' };
     const generatedQuestions = await generateQuestionsFromPrompt(config);
     setQuestions(generatedQuestions);
   };
@@ -31,7 +34,7 @@ const QuizGenerator = () => {
           type="number"
           id="numQuestions"
           value={numQuestions}
-          onChange={(e) => setNumQuestions(e.target.value)}
+          onChange={(e) => setNumQuestions(Number(e.target.value))}
         />
 
         <label htmlFor="difficulty">Difficulty:</label>

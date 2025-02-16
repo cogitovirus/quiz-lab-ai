@@ -1,9 +1,9 @@
 // src/app/lib/types/quiz.ts
 export interface QuizConfig {
     prompt: string;
-    difficulty: 'easy' | 'medium' | 'hard';
+    difficulty: string;
     numQuestions: number;
-    questionType: 'multichoice';
+    questionType: string;
   }
   
   export interface QuizQuestion {

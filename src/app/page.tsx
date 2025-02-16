@@ -1,6 +1,6 @@
 // src/app/page.tsx
 import React from 'react';
-import Input from './components/ui/Input';
+import QuizGenerator from './components/quiz/QuizGenerator';
 
 export default function Home() {
   return (
@@ -12,7 +12,7 @@ export default function Home() {
         <p className="text-lg text-gray-300 text-center">
           AI-powered interactive quiz generator for studying and exam preparation.
         </p>
-        <Input />
+        <QuizGenerator />
       </div>
     </div>
   )
