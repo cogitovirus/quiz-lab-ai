@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import { generateQuestionsFromPrompt } from '../../lib/services/openai/client';
 import QuizResults from './QuizResults';
 import { QuizQuestion } from '../../lib/types/quiz';
 
@@ -13,8 +12,15 @@ const QuizGenerator = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const config = { prompt, numQuestions, difficulty, questionType: 'multichoice' };
-    const generatedQuestions = await generateQuestionsFromPrompt(config);
+    const config = { prompt, numQuestions, difficulty };
+    const response = await fetch('/api/quiz/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(config),
+    });
+    const generatedQuestions = await response.json();
     setQuestions(generatedQuestions);
   };
 

@@ -3,7 +3,9 @@
 import { QuizConfig, QuizQuestion } from "../../types/quiz";
 import OpenAI from "openai";
 
-const openai = new OpenAI();
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 export const generateQuestionsFromPrompt = async (config: QuizConfig): Promise<QuizQuestion[]> => {
   const { prompt, numQuestions, difficulty } = config;
