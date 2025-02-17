@@ -21,7 +21,55 @@ export const generateQuestionsFromPrompt = async (config: QuizConfig): Promise<Q
     store: true,
     messages: [
       { role: "user", content: systemPrompt }
-    ]
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "typescript_quiz_schema",
+        schema: {
+          type: "object",
+          properties: {
+            questions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  question: {
+                    type: "string",
+                    description: "The question text"
+                  },
+                  answers: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        text: {
+                          type: "string",
+                          description: "Answer text"
+                        },
+                        isCorrect: {
+                          type: "boolean",
+                          description: "Indicates if the answer is correct"
+                        }
+                      },
+                      required: ["text", "isCorrect"]
+                    },
+                    description: "Array of possible answers"
+                  },
+                  explanation: {
+                    type: "string",
+                    description: "Explanation of the correct answer"
+                  }
+                },
+                required: ["question", "answers", "explanation"]
+              },
+              description: "List of quiz questions"
+            }
+          },
+          required: ["questions"]
+        }
+      }
+    },
   });
 
   const data = completion.choices[0].message.content;
