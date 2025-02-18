@@ -1,54 +1,62 @@
-// app/(components)/quiz/QuestionCard.tsx
-
-"use client";
-
-import React, { useState } from 'react'
-import PrimaryButton from '../ui/PrimaryButton'
+import React, { useState } from 'react';
+import { QuizQuestion } from '../../lib/types/quiz';
+import PrimaryButton from '../ui/PrimaryButton';
 
 interface QuestionCardProps {
-  question: {
-    text: string
-    correctAnswer: string
-  }
-  onNext: (wasCorrect: boolean) => void
+  question: QuizQuestion;
+  onNext: (wasCorrect: boolean) => void;
 }
 
 export default function QuestionCard({ question, onNext }: QuestionCardProps) {
-  const [userAnswer, setUserAnswer] = useState('')
-  const [validated, setValidated] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
+  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleValidate = () => {
-    const correct = userAnswer.trim().toLowerCase() === question.correctAnswer.toLowerCase()
-    setIsCorrect(correct)
-    setValidated(true)
-  }
+  const handleAnswerChange = (answer: string) => {
+    setSelectedAnswer(answer);
+  };
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    const correctAnswer = question.answers.find((answer) => answer.isCorrect)?.text;
+    const wasCorrect = selectedAnswer === correctAnswer;
+    setShowExplanation(true);
+    setTimeout(() => {
+      setShowExplanation(false);
+      setSubmitted(false);
+      onNext(wasCorrect);
+    }, 2000); // Show explanation for 2 seconds before moving to the next question
+  };
 
   return (
-    <div className="bg-white rounded-md shadow p-4">
-      <h3 className="font-bold text-lg mb-2">{question.text}</h3>
-      <input
-        type="text"
-        value={userAnswer}
-        onChange={(e) => setUserAnswer(e.target.value)}
-        placeholder="Your answer..."
-        className="border border-gray-300 rounded px-3 py-2 text-sm w-full mb-4"
-      />
-
-      {!validated ? (
-        <PrimaryButton onClick={handleValidate}>Validate</PrimaryButton>
-      ) : (
-        <div>
-          {isCorrect ? (
-            <p className="text-green-600 mb-4">Correct!</p>
-          ) : (
-            <p className="text-red-600 mb-4">Incorrect.</p>
-          )}
-          <PrimaryButton onClick={() => onNext(isCorrect)}>
-            Next Question
-          </PrimaryButton>
-        </div>
+    <div className="bg-white rounded-md shadow p-4 flex flex-col items-center">
+      <h2>{question.question}</h2>
+      <ul>
+        {question.answers.map((answer, i) => (
+          <li key={i} className={`mb-2 ${submitted && answer.isCorrect ? 'text-green-500' : submitted && selectedAnswer === answer.text && !answer.isCorrect ? 'text-red-500' : ''}`}>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name={question.id}
+                value={answer.text}
+                checked={selectedAnswer === answer.text}
+                onChange={() => handleAnswerChange(answer.text)}
+                className="mr-2"
+                disabled={submitted}
+              />
+              {answer.text}
+            </label>
+          </li>
+        ))}
+      </ul>
+      {showExplanation && (
+        <p className="text-gray-700 mt-4">
+          <strong>Explanation:</strong> {question.explanation}
+        </p>
       )}
+      <PrimaryButton onClick={handleSubmit} disabled={!selectedAnswer || submitted}>
+        Submit
+      </PrimaryButton>
     </div>
-  )
+  );
 }

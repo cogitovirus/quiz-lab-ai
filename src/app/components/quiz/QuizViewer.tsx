@@ -1,12 +1,10 @@
-// app/(components)/quiz/QuizViewer.tsx
-
 "use client";
 
-import React from 'react'
-import { useQuizContext } from '../../lib/contexts/QuizContext'
-import Spinner from '../ui/Spinner'
-import QuestionCard from './QuestionCard'
-import QuizResultCard from './QuizResultCard'
+import React from 'react';
+import { useQuizContext } from '../../lib/contexts/QuizContext';
+import Spinner from '../ui/Spinner';
+import QuestionCard from './QuestionCard';
+import QuizResultCard from './QuizResultCard';
 
 export default function QuizViewer() {
   const {
@@ -19,7 +17,9 @@ export default function QuizViewer() {
     setIsFinished,
     score,
     setScore,
-  } = useQuizContext()
+    setQuizStarted,
+    setQuestions,
+  } = useQuizContext();
 
   // If quiz not started: show placeholder
   if (!quizStarted) {
@@ -27,7 +27,7 @@ export default function QuizViewer() {
       <div className="bg-white rounded-md shadow p-4">
         <p className="text-gray-500">Please enter the topic to generate questions.</p>
       </div>
-    )
+    );
   }
 
   // If loading: show spinner
@@ -36,23 +36,24 @@ export default function QuizViewer() {
       <div className="bg-white rounded-md shadow p-4 flex items-center justify-center">
         <Spinner />
       </div>
-    )
+    );
   }
 
   // If quiz is finished: show result card
   if (isFinished) {
     return (
       <QuizResultCard
-        score={score}
-        total={questions.length}
+        questions={questions}
         onRedo={() => {
           // reset the quiz
-          setIsFinished(false)
-          // Optionally set quizStarted=false, questions=[], etc.
-          // or you could handle this in QuizGenerator
+          setIsFinished(false);
+          setQuizStarted(false);
+          setCurrentQuestionIndex(0);
+          setScore(0);
+          setQuestions([]);
         }}
       />
-    )
+    );
   }
 
   // If we have no questions yet, possibly show an error or fallback
@@ -61,26 +62,26 @@ export default function QuizViewer() {
       <div className="bg-white rounded-md shadow p-4">
         <p className="text-gray-500">No questions available.</p>
       </div>
-    )
+    );
   }
 
   // Display the current question
-  const currentQuestion = questions[currentQuestionIndex]
+  const currentQuestion = questions[currentQuestionIndex];
 
   const handleNext = (wasCorrect: boolean) => {
-    if (wasCorrect) setScore(score + 1)
+    if (wasCorrect) setScore(score + 1);
 
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1)
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      setIsFinished(true)
+      setIsFinished(true);
     }
-  }
+  };
 
   return (
     <QuestionCard
       question={currentQuestion}
       onNext={handleNext}
     />
-  )
+  );
 }
