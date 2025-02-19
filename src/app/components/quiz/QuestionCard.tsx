@@ -31,7 +31,7 @@ export default function QuestionCard({ question, onNext }: QuestionCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-md shadow p-4 flex flex-col items-center">
+    <div className="bg-white rounded-md flex flex-col items-center">
       <h2>{question.question}</h2>
       <ul>
         {question.answers.map((answer, i) => (

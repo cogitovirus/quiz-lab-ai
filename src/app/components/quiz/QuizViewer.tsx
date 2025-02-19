@@ -92,10 +92,21 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
           </div>
         )
       ) : (
-        <div className="flex flex-col flex-grow items-center justify-center">
-          <p className="text-gray-500">Please enter the topic to generate questions.</p>
+        <div className="flex flex-col flex-grow">
+          <div className="flex-grow flex items-center justify-center">
+            <p className="text-gray-500">Enter the topic to generate questions.</p>
+          </div>
+          <div className="mt-4 p-4 bg-gray-100 rounded-md text-sm text-gray-700">
+            <h4 className="font-bold mb-2">Tips:</h4>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Use clear and specific topics (e.g., &quot;Blob storage in Azure&quot;).</li>
+              <li>Use your preferred language for the questions and answers.</li>
+              <li>Include any specific subtopics or areas of focus (e.g., &quot;focus on the process of photosynthesis&quot;).</li>
+              <li>Provide context if necessary (e.g., &quot;for a Azure Developer certification exam&quot;).</li>
+            </ul>
+          </div>
         </div>
       )}
     </div>
   );
-};
+}
