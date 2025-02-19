@@ -10,15 +10,31 @@ const openai = new OpenAI({
 export const generateQuestionsFromPrompt = async (config: QuizConfig): Promise<QuizQuestion[]> => {
   const { prompt, numQuestions, difficulty } = config;
 
-  const systemPrompt = `You are a helpful assistant that generates multiple-choice quiz questions. You will receive a topic, number of questions, and difficulty level, and you will return a set of questions based on the following format:
+  const systemPrompt = `
+    You are a helpful assistant that generates multiple-choice quiz questions.
 
-  - The quiz should contain ${numQuestions} questions about the topic "${prompt}" with a difficulty of "${difficulty}".
-  - Each question will have four possible answers. Only one of them will be correct, and you should indicate which answer is correct.
-  - For each question, provide a brief explanation of why the correct answer is the right one.
-  - The questions and answers should be in the same language as the topic.
-  - The difficulty level should be reflected in the complexity of the questions. Pay attention to that
-  - Hard questions should be challenging and require a deep understanding of the topic.
-  - Medium questions should require a good understanding of the topic.`;
+    ## Instructions:
+    You will receive a **topic**, **number of questions**, and a **difficulty level**.
+    You must generate **${numQuestions}** questions on the topic **"${prompt}"**, ensuring that the difficulty level is strictly **"${difficulty}"**.
+
+    ## **Difficulty Guidelines**:
+    - **Easy**: Questions should be basic, requiring only fundamental knowledge.
+    - **Medium**: Questions should require a solid understanding, with moderate complexity.
+    - **Hard**: Questions should be complex, requiring deep knowledge and analysis.
+
+    ## **Question Format**:
+    Each question must include:
+    1. A **multiple-choice question** relevant to the topic.
+    2. Four possible answers (**A, B, C, D**), with **only one correct answer**.
+    3. A **clear indication of the correct answer**.
+    4. A **brief explanation** of why the correct answer is correct.
+
+    ### **Important Rules**:
+    - The difficulty must match the given level. **Do not simplify hard questions**.
+    - Keep all content in the same language as the topic.
+
+    Now, generate the quiz:
+  `;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
