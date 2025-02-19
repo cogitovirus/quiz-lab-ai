@@ -1,11 +1,9 @@
-"use client";
-
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useQuizContext } from '../../lib/contexts/QuizContext';
 import QuizControls from './QuizControls';
 import ShortcutHints from './ShortcutHints';
 
-export default function QuizGenerator() {
+export default function QuizGenerator({ isActive }: { isActive: boolean }) {
   const {
     setQuizStarted,
     setIsLoading,
@@ -18,6 +16,32 @@ export default function QuizGenerator() {
   const [prompt, setPrompt] = useState('');
   const [numQuestions, setNumQuestions] = useState(5);
   const [difficulty, setDifficulty] = useState('easy');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isActive && inputRef.current) {
+      inputRef.current.focus();
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'ArrowLeft') {
+        setNumQuestions((prev) => Math.max(prev - 1, 1));
+      } else if (event.ctrlKey && event.key === 'ArrowRight') {
+        setNumQuestions((prev) => Math.min(prev + 1, 50));
+      } else if (event.ctrlKey && event.key === 'ArrowUp') {
+        setDifficulty((prev) => (prev === 'easy' ? 'medium' : prev === 'medium' ? 'hard' : 'hard'));
+      } else if (event.ctrlKey && event.key === 'ArrowDown') {
+        setDifficulty((prev) => (prev === 'hard' ? 'medium' : prev === 'medium' ? 'easy' : 'easy'));
+      } else if (event.key === 'Enter') {
+        handleGenerate();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isActive]);
 
   const handleGenerate = async () => {
     if (!prompt) return;
@@ -46,11 +70,6 @@ export default function QuizGenerator() {
     handleGenerate();
   };
 
-  // const handleRedo = () => {
-  //   setQuizStarted(false);
-  //   setQuestions([]);
-  // };
-
   return (
     <div className="bg-white rounded-md shadow p-4 flex flex-col h-full justify-between">
       <QuizControls
@@ -62,6 +81,7 @@ export default function QuizGenerator() {
         onNumQuestionsChange={setNumQuestions}
         difficulty={difficulty}
         onDifficultyChange={setDifficulty}
+        inputRef={inputRef}
       />
 
       <div className="mt-4">
@@ -69,5 +89,4 @@ export default function QuizGenerator() {
       </div>
     </div>
   );
-}
-
+};

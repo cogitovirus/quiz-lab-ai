@@ -14,7 +14,11 @@ export const generateQuestionsFromPrompt = async (config: QuizConfig): Promise<Q
 
   - The quiz should contain ${numQuestions} questions about the topic "${prompt}" with a difficulty of "${difficulty}".
   - Each question will have four possible answers. Only one of them will be correct, and you should indicate which answer is correct.
-  - For each question, provide a brief explanation of why the correct answer is the right one.`;
+  - For each question, provide a brief explanation of why the correct answer is the right one.
+  - The questions and answers should be in the same language as the topic.
+  - The difficulty level should be reflected in the complexity of the questions. Pay attention to that
+  - Hard questions should be challenging and require a deep understanding of the topic.
+  - Medium questions should require a good understanding of the topic.`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",

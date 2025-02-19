@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from 'react';
 import { QuizQuestion } from '../../lib/types/quiz';
 import PrimaryButton from '../ui/PrimaryButton';

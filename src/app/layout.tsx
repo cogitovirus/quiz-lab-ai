@@ -1,4 +1,3 @@
-// src/app/layout.tsx
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -20,14 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gray-100 min-h-screen`}>
+      <body className={`${inter.className} bg-gray-100 min-h-screen flex flex-col`}>
         <QuizProvider>
           <Header />
-          <main className="min-h-[80vh] flex flex-col">{children}</main>
+            <main className="flex-grow flex flex-col h-full">{children}</main>
           <Footer />
         </QuizProvider>
-
       </body>
     </html>
   )
-};
+}

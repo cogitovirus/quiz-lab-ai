@@ -10,8 +10,8 @@ export interface QuizConfig {
     id: string;
     question: string;
     options: string[];
-    correctAnswer: string;
     explanation: string;
+    answer: string;
   }
   
   export interface QuizState {
