@@ -33,6 +33,7 @@ export default function QuizControls({
         placeholder="Enter quiz topic..."
         className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
         ref={inputRef}
+        id="quiz-generator-input"
       />
 
       <div className="flex items-center gap-2">

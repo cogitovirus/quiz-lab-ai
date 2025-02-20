@@ -21,6 +21,13 @@ export default function HomePage() {
     };
   }, []);
 
+  useEffect(() => {
+    // Set initial focus state
+    if (activeComponent === 'generator') {
+      document.getElementById('quiz-generator-input')?.focus();
+    }
+  }, [activeComponent]);
+
   return (
     <div className="flex flex-col md:flex-row gap-4 md:gap-8 px-4 py-6 max-w-[1200px] mx-auto w-full flex-grow h-full">
       {/* Left Side */}

@@ -14,7 +14,7 @@ export default function QuizResultCard({ score, total, onRedo }: QuizResultCardP
       <p className="text-gray-700 mb-4">
         You scored {score} out of {total}.
       </p>
-      <PrimaryButton onClick={onRedo}>Redo</PrimaryButton>
+      <PrimaryButton onClick={onRedo}>Reset</PrimaryButton>
     </div>
   );
 }

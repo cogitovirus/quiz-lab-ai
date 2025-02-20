@@ -1,33 +1,63 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import { QuizQuestion } from '../../lib/types/quiz';
-import PrimaryButton from '../ui/PrimaryButton';
+import React, { useEffect, useState } from "react";
+import { QuizQuestion } from "../../lib/types/quiz";
+import PrimaryButton from "../ui/PrimaryButton";
 
 interface QuestionCardProps {
   question: QuizQuestion;
   onNext: (wasCorrect: boolean) => void;
+  isActive: boolean;
+  currentQuestionIndex: number;
+  totalQuestions: number;
 }
 
-export default function QuestionCard({ question, onNext }: QuestionCardProps) {
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
-  const [showExplanation, setShowExplanation] = useState(false);
+export default function QuestionCard({
+  question,
+  onNext,
+  isActive,
+  currentQuestionIndex,
+  totalQuestions,
+}: QuestionCardProps) {
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
 
-  const handleAnswerChange = (answer: string) => {
-    setSelectedAnswer(answer);
-  };
+  useEffect(() => {
+    if (!isActive) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowUp") {
+        setSelectedAnswerIndex((prev) =>
+          prev === null ? 0 : Math.max(prev - 1, 0)
+        );
+      } else if (event.key === "ArrowDown") {
+        setSelectedAnswerIndex((prev) =>
+          prev === null ? 0 : Math.min(prev + 1, question.answers.length - 1)
+        );
+      } else if (event.key === "Enter" && selectedAnswerIndex !== null) {
+        handleSubmit();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isActive, selectedAnswerIndex, question.answers.length]);
 
   const handleSubmit = () => {
+    if (selectedAnswerIndex === null) return;
     setSubmitted(true);
     const correctAnswer = question.answers.find((answer) => answer.isCorrect)?.text;
-    const wasCorrect = selectedAnswer === correctAnswer;
+    const wasCorrect = question.answers[selectedAnswerIndex].text === correctAnswer;
     setShowExplanation(true);
+
     setTimeout(() => {
       setShowExplanation(false);
       setSubmitted(false);
       onNext(wasCorrect);
-    }, 2000); // Show explanation for 2 seconds before moving to the next question
+    }, 2000);
   };
 
   return (
@@ -35,14 +65,20 @@ export default function QuestionCard({ question, onNext }: QuestionCardProps) {
       <h2>{question.question}</h2>
       <ul>
         {question.answers.map((answer, i) => (
-          <li key={i} className={`mb-2 ${submitted && answer.isCorrect ? 'text-green-500' : submitted && selectedAnswer === answer.text && !answer.isCorrect ? 'text-red-500' : ''}`}>
+          <li
+            key={i}
+            className={`mb-2 cursor-pointer ${
+              selectedAnswerIndex === i ? "bg-gray-200" : ""
+            } ${submitted && answer.isCorrect ? "text-green-500" : 
+               submitted && selectedAnswerIndex === i && !answer.isCorrect ? "text-red-500" : ""}`}
+          >
             <label className="flex items-center">
               <input
                 type="radio"
                 name={question.id}
                 value={answer.text}
-                checked={selectedAnswer === answer.text}
-                onChange={() => handleAnswerChange(answer.text)}
+                checked={selectedAnswerIndex === i}
+                onChange={() => setSelectedAnswerIndex(i)}
                 className="mr-2"
                 disabled={submitted}
               />
@@ -56,9 +92,13 @@ export default function QuestionCard({ question, onNext }: QuestionCardProps) {
           <strong>Explanation:</strong> {question.explanation}
         </p>
       )}
-      <PrimaryButton onClick={handleSubmit} disabled={!selectedAnswer || submitted}>
+      <PrimaryButton onClick={handleSubmit} disabled={selectedAnswerIndex === null || submitted}>
         Submit
       </PrimaryButton>
+
+      <p className="text-gray-500 mb-4">
+        Question {currentQuestionIndex + 1} of {totalQuestions}
+      </p>
     </div>
   );
 }
