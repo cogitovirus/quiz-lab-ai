@@ -46,6 +46,13 @@ export default function QuestionCard({
     };
   }, [isActive, selectedAnswerIndex, question.answers.length]);
 
+  useEffect(() => {
+    // Reset state when the current question index changes
+    setSelectedAnswerIndex(null);
+    setSubmitted(false);
+    setShowExplanation(false);
+  }, [currentQuestionIndex]);
+
   const handleSubmit = () => {
     if (selectedAnswerIndex === null) return;
     setSubmitted(true);

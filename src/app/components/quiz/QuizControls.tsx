@@ -5,7 +5,7 @@ interface QuizControlsProps {
   prompt: string;
   onPromptChange: (val: string) => void;
   onGenerate: () => void;
-  onRegenerate: () => void;
+  onReset: () => void;
   numQuestions: number;
   onNumQuestionsChange: (val: number) => void;
   difficulty: string;
@@ -17,7 +17,7 @@ export default function QuizControls({
   prompt,
   onPromptChange,
   onGenerate,
-  onRegenerate,
+  onReset,
   numQuestions,
   onNumQuestionsChange,
   difficulty,
@@ -36,15 +36,16 @@ export default function QuizControls({
         id="quiz-generator-input"
       />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
         <PrimaryButton onClick={onGenerate}>Generate</PrimaryButton>
-        <button
-          onClick={onRegenerate}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
-          Regenerate
-        </button>
-        {/* Additional config button if needed */}
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={onReset}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Reset
+          </button>
+        </div>
       </div>
 
       <div className="mt-4">

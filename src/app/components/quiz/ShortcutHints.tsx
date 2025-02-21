@@ -16,7 +16,6 @@ export default function ShortcutHints() {
           </ul>
         </li>
         <li><strong>Arrow up/down</strong> - Switch between answers toggles</li>
-        <li><strong>Ctrl/⌘ + Shift + R</strong> -  Regenerate quiz with the same prompt</li>
         <li><strong>Ctrl/⌘ + Shift + X</strong> - Reset quiz</li>
         <li><strong>Ctrl/⌘ + Arrow up/down</strong> - Increase/decrease difficulty</li>
         <li><strong>Ctrl/⌘ + Arrow right/left</strong> - Increase/decrease number of questions</li>

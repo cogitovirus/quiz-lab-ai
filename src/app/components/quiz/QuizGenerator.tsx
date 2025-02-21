@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useQuizContext } from '../../lib/contexts/QuizContext';
 import QuizControls from './QuizControls';
 import ShortcutHints from './ShortcutHints';
@@ -19,31 +17,6 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
   const [numQuestions, setNumQuestions] = useState(5);
   const [difficulty, setDifficulty] = useState('easy');
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Ensure `handleGenerate` is stable across renders
-  const handleGenerate = useCallback(async () => {
-    if (!prompt) return;
-
-    setQuizStarted(true);
-    setIsLoading(true);
-    setIsFinished(false);
-    setScore(0);
-    setQuestions([]); // clear previous data
-    setCurrentQuestionIndex(0);
-
-    const config = { prompt, numQuestions, difficulty };
-    const response = await fetch('/api/quiz/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(config),
-    });
-
-    const generatedQuestions = await response.json();
-    setQuestions(generatedQuestions);
-    setIsLoading(false);
-  }, [prompt, numQuestions, difficulty, setQuizStarted, setIsLoading, setIsFinished, setScore, setQuestions, setCurrentQuestionIndex]);
 
   useEffect(() => {
     if (isActive && inputRef.current) {
@@ -72,10 +45,37 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isActive, handleGenerate]);
+  }, [isActive]);
 
-  const handleRegenerate = () => {
-    handleGenerate();
+  const handleGenerate = async () => {
+    if (!prompt) return;
+
+    setQuizStarted(true);
+    setIsLoading(true);
+    setIsFinished(false);
+    setScore(0);
+    setQuestions([]); // clear previous data
+    setCurrentQuestionIndex(0);
+
+    const config = { prompt, numQuestions, difficulty };
+    const response = await fetch('/api/quiz/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(config),
+    });
+    const generatedQuestions = await response.json();
+    setQuestions(generatedQuestions);
+    setIsLoading(false);
+  };
+
+  const handleReset = () => {
+    setQuizStarted(true);
+    setIsLoading(false);
+    setIsFinished(false);
+    setScore(0);
+    setCurrentQuestionIndex(0);
   };
 
   return (
@@ -84,7 +84,7 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
         prompt={prompt}
         onPromptChange={setPrompt}
         onGenerate={handleGenerate}
-        onRegenerate={handleRegenerate}
+        onReset={handleReset}
         numQuestions={numQuestions}
         onNumQuestionsChange={setNumQuestions}
         difficulty={difficulty}
@@ -97,4 +97,4 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
       </div>
     </div>
   );
-}
+};
