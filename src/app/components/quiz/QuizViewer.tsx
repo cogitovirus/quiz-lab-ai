@@ -16,12 +16,16 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
     isFinished,
     setIsFinished,
     score,
-    setScore,
-    setQuizStarted,
-    setQuestions,
+    setScore
   } = useQuizContext();
 
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
+
+  const handleRedo = () => {
+    setScore(0);
+    setCurrentQuestionIndex(0);
+    setIsFinished(false);
+  };
 
   useEffect(() => {
     if (!isActive) return;
@@ -35,14 +39,21 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
         // Submit the answer
         const currentQuestion = questions[currentQuestionIndex];
         const correctAnswer = currentQuestion.answers.find(
-          (answer) => answer.isCorrect
+          (answer: { isCorrect: boolean }) => answer.isCorrect
         )?.text;
         const wasCorrect = currentQuestion.answers[selectedAnswerIndex || 0].text === correctAnswer;
         setScore((prev) => (wasCorrect ? prev + 1 : prev));
         setCurrentQuestionIndex((prev) =>
           prev < questions.length - 1 ? prev + 1 : prev
         );
-        setSelectedAnswerIndex(null); // Reset selected answer index for the next question
+        setSelectedAnswerIndex(null);
+      } else if (
+        (event.ctrlKey || event.metaKey) &&
+        event.shiftKey &&
+        event.key.toLowerCase() === "x"
+      ) {
+        // Ctrl/⌘ + Shift + X -> Reset quiz
+        handleRedo();
       }
     };
 
@@ -50,7 +61,10 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isActive, questions, currentQuestionIndex, selectedAnswerIndex]);
+  }, [isActive, questions, currentQuestionIndex, selectedAnswerIndex, setCurrentQuestionIndex, setScore, handleRedo]);
+
+  useEffect(() => {
+  }, [quizStarted, isLoading, currentQuestionIndex, isFinished, score]);
 
   const handleNext = (wasCorrect: boolean) => {
     if (wasCorrect) setScore(score + 1);
@@ -61,12 +75,6 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
       setIsFinished(true);
     }
     setSelectedAnswerIndex(null); // Reset selected answer index for the next question
-  };
-
-  const handleRedo = () => {
-    setScore(0);
-    setCurrentQuestionIndex(0);
-    setIsFinished(false);
   };
 
   return (
@@ -88,10 +96,10 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
           <div className="flex flex-col flex-grow">
             <QuestionCard
               question={questions[currentQuestionIndex]}
-              selectedAnswerIndex={selectedAnswerIndex}
               onNext={handleNext}
               currentQuestionIndex={currentQuestionIndex}
               totalQuestions={questions.length}
+              isActive={isActive}
             />
           </div>
         ) : (

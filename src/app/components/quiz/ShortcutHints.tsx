@@ -15,7 +15,7 @@ export default function ShortcutHints() {
             <li>Submit answer (when on quiz viewer card)</li>
           </ul>
         </li>
-        <li><strong>Arrow up/down</strong> - Switch between answers toggles</li>
+        <li><strong>Arrow up/down</strong> - Switch between answers (when on quiz viewer card)</li>
         <li><strong>Ctrl/⌘ + Shift + X</strong> - Reset quiz</li>
         <li><strong>Ctrl/⌘ + Arrow up/down</strong> - Increase/decrease difficulty</li>
         <li><strong>Ctrl/⌘ + Arrow right/left</strong> - Increase/decrease number of questions</li>
