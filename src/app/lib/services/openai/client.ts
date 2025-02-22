@@ -37,7 +37,7 @@ export const generateQuestionsFromPrompt = async (config: QuizConfig): Promise<Q
   `;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: process.env.OPENAI_MODEL,
     store: true,
     messages: [
       { role: "user", content: systemPrompt }
