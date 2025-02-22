@@ -7,14 +7,16 @@ interface QuizResultCardProps {
   onRedo: () => void;
 }
 
-export default function QuizResultCard({ score, total, onRedo }: QuizResultCardProps) {
-  const percentage = (score / total) * 100;
-  const [showFireworks, setShowFireworks] = useState(false);
+const QuizResultCard: React.FC<QuizResultCardProps> = ({ score, total, onRedo }) => {
+  const [showFireworks, setShowFireworks] = useState<boolean>(false);
+
+  const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
   useEffect(() => {
     if (percentage >= 70) {
       setShowFireworks(true);
-      setTimeout(() => setShowFireworks(false), 2000); // Fireworks last for 2 seconds
+      const timer = setTimeout(() => setShowFireworks(false), 2000);
+      return () => clearTimeout(timer);
     }
   }, [percentage]);
 
@@ -24,26 +26,26 @@ export default function QuizResultCard({ score, total, onRedo }: QuizResultCardP
         {/* Fireworks Animation */}
         {showFireworks && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="animate-fireworks w-32 h-32 bg-transparent"></div>
+            <div className="w-32 h-32 bg-transparent animate-fireworks"></div>
           </div>
         )}
-  
+
         {/* Animated Score Display */}
         <div
           className={`text-4xl font-bold transition-transform duration-700 ${
             percentage >= 70
-              ? "text-green-500 animate-celebrate" // Fireworks animation effect
-              : "text-red-500 animate-shake" // Try again shake effect
+              ? "text-green-500 animate-celebrate"
+              : "text-red-500 animate-shake"
           }`}
         >
           {score} / {total}
         </div>
-  
+
         {/* Score Message */}
         <p className="text-gray-700 dark:text-gray-300 text-lg mt-2">
           {percentage >= 70 ? "🎆 Amazing! You crushed it! 🎆" : "😢 Try again, you'll get there!"}
         </p>
-  
+
         {/* Reset Button */}
         <SecondaryButton onClick={onRedo} className="mt-6">
           Reset
@@ -51,5 +53,6 @@ export default function QuizResultCard({ score, total, onRedo }: QuizResultCardP
       </div>
     </div>
   );
-  
-}
+};
+
+export default QuizResultCard;

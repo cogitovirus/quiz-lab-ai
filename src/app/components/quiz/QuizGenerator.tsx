@@ -1,9 +1,13 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useQuizContext } from '../../lib/contexts/QuizContext';
-import QuizControls from './QuizControls';
-import ShortcutHints from './ShortcutHints';
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useQuizContext } from "../../lib/contexts/QuizContext";
+import QuizControls from "./QuizControls";
+import ShortcutHints from "./ShortcutHints";
 
-export default function QuizGenerator({ isActive }: { isActive: boolean }) {
+interface QuizGeneratorProps {
+  isActive: boolean;
+}
+
+const QuizGenerator: React.FC<QuizGeneratorProps> = ({ isActive }) => {
   const {
     setQuizStarted,
     setIsLoading,
@@ -13,61 +17,79 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
     setScore,
   } = useQuizContext();
 
-  const [prompt, setPrompt] = useState('');
-  const [numQuestions, setNumQuestions] = useState(15);
-  const [difficulty, setDifficulty] = useState('easy');
+  const [prompt, setPrompt] = useState<string>("");
+  const [numQuestions, setNumQuestions] = useState<number>(15);
+  const [difficulty, setDifficulty] = useState<string>("easy");
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Function to fetch questions in batches
-  const fetchQuestionsInBatches = async (prompt: string, numQuestions: number, difficulty: string) => {
-    const batchSize = 15; // Define the batch size
-    const totalBatches = Math.ceil(numQuestions / batchSize);
+  const fetchQuestionsInBatches = useCallback(
+    async (prompt: string, numQuestions: number, difficulty: string) => {
+      const batchSize = 15;
+      const totalBatches = Math.ceil(numQuestions / batchSize);
+      setIsLoading(true);
 
-    for (let i = 0; i < totalBatches; i++) {
-      const batchConfig = {
-        prompt,
-        numQuestions: Math.min(batchSize, numQuestions - i * batchSize),
-        difficulty,
-      };
+      try {
+        const batchPromises = Array.from({ length: totalBatches }, (_, i) => {
+          const batchConfig = {
+            prompt,
+            numQuestions: Math.min(batchSize, numQuestions - i * batchSize),
+            difficulty,
+          };
 
-      const response = await fetch('/api/quiz/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(batchConfig),
-      });
+          return fetch("/api/quiz/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(batchConfig),
+          })
+            .then((res) => res.json())
+            .catch(() => []);
+        });
 
-      const batchQuestions = await response.json();
-      setQuestions((prevQuestions) => [...prevQuestions, ...batchQuestions]);
-
-      if (i === 0) {
-        setIsLoading(false); // Stop loading after the first batch
+        const results = await Promise.all(batchPromises);
+        setQuestions(results.flat());
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-  };
+    },
+    [setIsLoading, setQuestions]
+  );
 
-  // Memoized handleGenerate to prevent unnecessary re-renders
+  // Memoized handleGenerate function
   const handleGenerate = useCallback(async () => {
-    if (!prompt) return;
+    if (!prompt.trim()) return;
 
     setQuizStarted(true);
-    setIsLoading(true);
     setIsFinished(false);
     setScore(0);
-    setQuestions([]); // Clear previous data
+    setQuestions([]);
     setCurrentQuestionIndex(0);
 
     await fetchQuestionsInBatches(prompt, numQuestions, difficulty);
-  }, [prompt, numQuestions, difficulty, setQuizStarted, setIsLoading, setIsFinished, setScore, setQuestions, setCurrentQuestionIndex]);
+  }, [
+    prompt,
+    numQuestions,
+    difficulty,
+    setQuizStarted,
+    setIsFinished,
+    setScore,
+    setQuestions,
+    setCurrentQuestionIndex,
+    fetchQuestionsInBatches,
+  ]);
 
-  // Memoized handleReset to prevent re-renders
+  // Memoized handleReset function
   const handleReset = useCallback(() => {
-    setQuizStarted(true);
+    setQuizStarted(false);
     setIsLoading(false);
     setIsFinished(false);
     setScore(0);
     setCurrentQuestionIndex(0);
   }, [setQuizStarted, setIsLoading, setIsFinished, setScore, setCurrentQuestionIndex]);
 
+  // Handle keyboard shortcuts
   useEffect(() => {
     if (isActive && inputRef.current) {
       inputRef.current.focus();
@@ -76,27 +98,34 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isActive) return;
 
-      const isCtrlOrMeta = event.ctrlKey || event.metaKey;
+      const { key, ctrlKey, metaKey, shiftKey } = event;
+      const isCtrlOrMeta = ctrlKey || metaKey;
 
-      if (isCtrlOrMeta && event.key === 'ArrowLeft') {
-        setNumQuestions((prev) => Math.max(prev - 1, 1));
-      } else if (isCtrlOrMeta && event.key === 'ArrowRight') {
-        setNumQuestions((prev) => Math.min(prev + 1, 45));
-      } else if (isCtrlOrMeta && event.key === 'ArrowUp') {
-        setDifficulty((prev) => (prev === 'easy' ? 'medium' : prev === 'medium' ? 'hard' : 'hard'));
-      } else if (isCtrlOrMeta && event.key === 'ArrowDown') {
-        setDifficulty((prev) => (prev === 'hard' ? 'medium' : prev === 'medium' ? 'easy' : 'easy'));
-      } else if (isCtrlOrMeta && event.shiftKey && event.key.toLowerCase() === 'x') {
-        handleReset();
-      } else if (event.key === 'Enter') {
+      if (isCtrlOrMeta) {
+        if (key === "ArrowLeft") {
+          setNumQuestions((prev) => Math.max(prev - 1, 1));
+        } else if (key === "ArrowRight") {
+          setNumQuestions((prev) => Math.min(prev + 1, 45));
+        } else if (key === "ArrowUp") {
+          setDifficulty((prev) =>
+            prev === "easy" ? "medium" : prev === "medium" ? "hard" : "hard"
+          );
+        } else if (key === "ArrowDown") {
+          setDifficulty((prev) =>
+            prev === "hard" ? "medium" : prev === "medium" ? "easy" : "easy"
+          );
+        } else if (shiftKey && key.toLowerCase() === "x") {
+          handleReset();
+        }
+      } else if (key === "Enter") {
         event.preventDefault(); // Prevent form submission
         handleGenerate();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isActive, handleGenerate, handleReset]);
 
@@ -119,4 +148,6 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
       </div>
     </div>
   );
-}
+};
+
+export default QuizGenerator;

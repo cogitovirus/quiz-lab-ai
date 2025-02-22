@@ -1,4 +1,3 @@
-// src/app/lib/types/quiz.ts
 export interface QuizConfig {
     prompt: string;
     difficulty: string;
