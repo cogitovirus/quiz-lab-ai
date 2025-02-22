@@ -14,13 +14,13 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
   } = useQuizContext();
 
   const [prompt, setPrompt] = useState('');
-  const [numQuestions, setNumQuestions] = useState(5);
+  const [numQuestions, setNumQuestions] = useState(15);
   const [difficulty, setDifficulty] = useState('easy');
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Function to fetch questions in batches
   const fetchQuestionsInBatches = async (prompt: string, numQuestions: number, difficulty: string) => {
-    const batchSize = 10; // Define the batch size
+    const batchSize = 15; // Define the batch size
     const totalBatches = Math.ceil(numQuestions / batchSize);
 
     for (let i = 0; i < totalBatches; i++) {
@@ -38,9 +38,11 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
 
       const batchQuestions = await response.json();
       setQuestions((prevQuestions) => [...prevQuestions, ...batchQuestions]);
-    }
 
-    setIsLoading(false);
+      if (i === 0) {
+        setIsLoading(false); // Stop loading after the first batch
+      }
+    }
   };
 
   // Memoized handleGenerate to prevent unnecessary re-renders
@@ -112,11 +114,7 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
         inputRef={inputRef}
       />
 
-      <div className="flex-grow mt-4">
-        {/* Main content goes here */}
-      </div>
-
-      <div className="mt-4">
+      <div className="mt-auto">
         <ShortcutHints />
       </div>
     </div>
