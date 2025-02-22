@@ -57,7 +57,7 @@ export default function QuizControls({
           type="range"
           id="numQuestions"
           min="1"
-          max="50"
+          max="45"
           value={numQuestions}
           onChange={(e) => onNumQuestionsChange(Number(e.target.value))}
           className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"

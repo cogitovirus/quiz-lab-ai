@@ -18,6 +18,31 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
   const [difficulty, setDifficulty] = useState('easy');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Function to fetch questions in batches
+  const fetchQuestionsInBatches = async (prompt: string, numQuestions: number, difficulty: string) => {
+    const batchSize = 10; // Define the batch size
+    const totalBatches = Math.ceil(numQuestions / batchSize);
+
+    for (let i = 0; i < totalBatches; i++) {
+      const batchConfig = {
+        prompt,
+        numQuestions: Math.min(batchSize, numQuestions - i * batchSize),
+        difficulty,
+      };
+
+      const response = await fetch('/api/quiz/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(batchConfig),
+      });
+
+      const batchQuestions = await response.json();
+      setQuestions((prevQuestions) => [...prevQuestions, ...batchQuestions]);
+    }
+
+    setIsLoading(false);
+  };
+
   // Memoized handleGenerate to prevent unnecessary re-renders
   const handleGenerate = useCallback(async () => {
     if (!prompt) return;
@@ -29,16 +54,7 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
     setQuestions([]); // Clear previous data
     setCurrentQuestionIndex(0);
 
-    const config = { prompt, numQuestions, difficulty };
-    const response = await fetch('/api/quiz/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(config),
-    });
-
-    const generatedQuestions = await response.json();
-    setQuestions(generatedQuestions);
-    setIsLoading(false);
+    await fetchQuestionsInBatches(prompt, numQuestions, difficulty);
   }, [prompt, numQuestions, difficulty, setQuizStarted, setIsLoading, setIsFinished, setScore, setQuestions, setCurrentQuestionIndex]);
 
   // Memoized handleReset to prevent re-renders
@@ -63,7 +79,7 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
       if (isCtrlOrMeta && event.key === 'ArrowLeft') {
         setNumQuestions((prev) => Math.max(prev - 1, 1));
       } else if (isCtrlOrMeta && event.key === 'ArrowRight') {
-        setNumQuestions((prev) => Math.min(prev + 1, 50));
+        setNumQuestions((prev) => Math.min(prev + 1, 45));
       } else if (isCtrlOrMeta && event.key === 'ArrowUp') {
         setDifficulty((prev) => (prev === 'easy' ? 'medium' : prev === 'medium' ? 'hard' : 'hard'));
       } else if (isCtrlOrMeta && event.key === 'ArrowDown') {
@@ -83,7 +99,7 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
   }, [isActive, handleGenerate, handleReset]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-md shadow p-4 flex flex-col h-full justify-between">
+    <div className="bg-white dark:bg-gray-800 rounded-md shadow p-4 flex flex-col h-full w-full">
       <QuizControls
         prompt={prompt}
         onPromptChange={setPrompt}
@@ -95,7 +111,11 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
         onDifficultyChange={setDifficulty}
         inputRef={inputRef}
       />
-      <div className="mt-4 flex-grow"></div>
+
+      <div className="flex-grow mt-4">
+        {/* Main content goes here */}
+      </div>
+
       <div className="mt-4">
         <ShortcutHints />
       </div>
