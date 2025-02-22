@@ -69,11 +69,11 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
   };
 
   return (
-    <div className="bg-white rounded-md shadow p-4 flex flex-col h-full">
+    <div className="bg-white dark:bg-gray-800 rounded-md shadow p-4 flex flex-col h-full">
       {quizStarted ? (
         isLoading ? (
           <div className="flex items-center justify-center flex-grow">
-            <p className="text-gray-500 mt-2">Please be patient, questions are being loaded...</p>
+            <p className="text-gray-500 dark:text-gray-300 mt-2">Please be patient, questions are being loaded...</p>
             <Spinner />
           </div>
         ) : isFinished ? (
@@ -96,15 +96,15 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
           </div>
         ) : (
           <div className="flex flex-col flex-grow items-center justify-center">
-            <p className="text-gray-500">No questions available.</p>
+            <p className="text-gray-500 dark:text-gray-300">No questions available.</p>
           </div>
         )
       ) : (
         <div className="flex flex-col flex-grow">
           <div className="flex-grow flex items-center justify-center">
-            <p className="text-gray-500">Enter the topic to generate questions.</p>
+            <p className="text-gray-500 dark:text-gray-300">Enter the topic to generate questions.</p>
           </div>
-          <div className="mt-4 p-4 bg-gray-100 rounded-md text-sm text-gray-700">
+          <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-300">
             <h4 className="font-bold mb-2">Tips:</h4>
             <ul className="list-disc list-inside space-y-1">
               <li>Use clear and specific topics (e.g., &quot;Blob storage in Azure&quot;).</li>

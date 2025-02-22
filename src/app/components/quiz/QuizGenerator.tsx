@@ -83,7 +83,7 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
   }, [isActive, handleGenerate, handleReset]);
 
   return (
-    <div className="bg-white rounded-md shadow p-4 flex flex-col h-full justify-between">
+    <div className="bg-white dark:bg-gray-800 rounded-md shadow p-4 flex flex-col h-full justify-between">
       <QuizControls
         prompt={prompt}
         onPromptChange={setPrompt}

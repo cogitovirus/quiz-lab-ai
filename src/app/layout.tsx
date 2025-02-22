@@ -22,10 +22,10 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={`${inter.className} bg-gray-100 min-h-screen flex flex-col`}>
+      <body className={`${inter.className} bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col`}>
         <QuizProvider>
           <Header />
-            <main className="flex-grow flex flex-col h-full">{children}</main>
+          <main className="flex-grow flex flex-col h-full">{children}</main>
           <Footer />
         </QuizProvider>
       </body>

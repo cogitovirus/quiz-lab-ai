@@ -84,14 +84,14 @@ export default function QuestionCard({
   
 
   return (
-    <div className="bg-white rounded-md flex flex-col items-center">
-      <h2>{question.question}</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-md flex flex-col items-center">
+      <h2 className="text-gray-900 dark:text-gray-100">{question.question}</h2>
       <ul>
         {question.answers.map((answer, i) => (
           <li
             key={i}
             className={`mb-2 cursor-pointer ${
-              selectedAnswerIndex === i ? "bg-gray-200" : ""
+              selectedAnswerIndex === i ? "bg-gray-200 dark:bg-gray-600" : ""
             } ${submitted && answer.isCorrect ? "text-green-500" : 
                submitted && selectedAnswerIndex === i && !answer.isCorrect ? "text-red-500" : ""}`}
           >
@@ -105,13 +105,13 @@ export default function QuestionCard({
                 className="mr-2"
                 disabled={submitted}
               />
-              {answer.text}
+              <span className="text-gray-900 dark:text-gray-100">{answer.text}</span>
             </label>
           </li>
         ))}
       </ul>
       {showExplanation && (
-        <p className="text-gray-700 mt-4">
+        <p className="text-gray-700 dark:text-gray-300 mt-4">
           <strong>Explanation:</strong> {question.explanation}
         </p>
       )}
@@ -119,7 +119,7 @@ export default function QuestionCard({
         Submit
       </PrimaryButton>
 
-      <p className="text-gray-500 mb-4">
+      <p className="text-gray-500 dark:text-gray-400 mb-4">
         Question {currentQuestionIndex + 1} of {totalQuestions}
       </p>
     </div>
