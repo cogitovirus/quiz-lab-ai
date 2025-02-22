@@ -36,8 +36,10 @@ export default function QuestionCard({
           prev === null ? 0 : Math.min(prev + 1, question.answers.length - 1)
         );
       } else if (event.key === "Enter") {
-        if (selectedAnswerIndex !== null && !submitted) {
+        if (!submitted) {
           handleSubmit();
+        } else {
+          handleNextQuestion();
         }
       }
     };
@@ -49,7 +51,6 @@ export default function QuestionCard({
   }, [isActive, selectedAnswerIndex, submitted]);
 
   useEffect(() => {
-    // Reset state when the current question index changes
     setSelectedAnswerIndex(null);
     setSubmitted(false);
     setShowExplanation(false);
@@ -59,26 +60,22 @@ export default function QuestionCard({
     if (selectedAnswerIndex === null || submitted) return;
 
     setSubmitted(true);
-
-    const correctAnswer = question.answers.find((answer) => answer.isCorrect)?.text;
-    const wasCorrect = question.answers[selectedAnswerIndex].text === correctAnswer;
     setShowExplanation(true);
+  };
 
-    setTimeout(() => {
-      setShowExplanation(false);
-      setSubmitted(false);
-      onNext(wasCorrect);
-    }, 2000);
+  const handleNextQuestion = () => {
+    if (!submitted) return;
+    setShowExplanation(false);
+    setSubmitted(false);
+    onNext(question.answers[selectedAnswerIndex!].isCorrect);
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl flex flex-col w-full max-w-2xl mx-auto p-6">
-      {/* Question */}
       <h2 className="text-gray-900 dark:text-gray-100 text-xl font-semibold mb-6 text-center">
         {question.question}
       </h2>
 
-      {/* Answer List */}
       <ul className="space-y-3">
         {question.answers.map((answer, i) => (
           <li
@@ -113,25 +110,22 @@ export default function QuestionCard({
         ))}
       </ul>
 
-      {/* Explanation */}
       {showExplanation && (
         <p className="text-gray-700 dark:text-gray-300 mt-6 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
           <strong>Explanation:</strong> {question.explanation}
         </p>
       )}
 
-      {/* Submit Button */}
       <div className="flex justify-center mt-6">
         <PrimaryButton
-          onClick={handleSubmit}
-          disabled={selectedAnswerIndex === null || submitted}
+          onClick={submitted ? handleNextQuestion : handleSubmit}
+          disabled={selectedAnswerIndex === null}
           className="w-full"
         >
-          Submit
+          {submitted ? "Next Question" : "Submit"}
         </PrimaryButton>
       </div>
 
-      {/* Question Counter */}
       <p className="text-gray-500 dark:text-gray-400 mt-6 text-center">
         Question {currentQuestionIndex + 1} of {totalQuestions}
       </p>
