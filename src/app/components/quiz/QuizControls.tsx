@@ -34,6 +34,7 @@ export default function QuizControls({
         className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
         ref={inputRef}
         id="quiz-generator-input"
+        autoComplete="off"
       />
 
       <div className="flex items-center justify-between gap-2">

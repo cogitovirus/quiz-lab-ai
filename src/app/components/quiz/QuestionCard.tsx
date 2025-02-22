@@ -25,7 +25,7 @@ export default function QuestionCard({
 
   useEffect(() => {
     if (!isActive) return;
-
+  
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp") {
         setSelectedAnswerIndex((prev) =>
@@ -35,16 +35,23 @@ export default function QuestionCard({
         setSelectedAnswerIndex((prev) =>
           prev === null ? 0 : Math.min(prev + 1, question.answers.length - 1)
         );
-      } else if (event.key === "Enter" && selectedAnswerIndex !== null) {
-        handleSubmit();
+      } else if (event.key === "Enter") {
+        console.log("Enter pressed. Current selection:", selectedAnswerIndex);
+        if (selectedAnswerIndex !== null && !submitted) {
+          handleSubmit();
+        } else {
+          console.log("Enter ignored: No answer selected.");
+        }
       }
     };
-
+  
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isActive, selectedAnswerIndex, question.answers.length]);
+  }, [isActive, selectedAnswerIndex, submitted]);
+  
+  
 
   useEffect(() => {
     // Reset state when the current question index changes
@@ -54,18 +61,27 @@ export default function QuestionCard({
   }, [currentQuestionIndex]);
 
   const handleSubmit = () => {
-    if (selectedAnswerIndex === null) return;
+    if (selectedAnswerIndex === null || submitted) {
+      console.log("Submission blocked: No answer selected or already submitted.");
+      return; // Prevent submission
+    }
+  
     setSubmitted(true);
+  
     const correctAnswer = question.answers.find((answer) => answer.isCorrect)?.text;
     const wasCorrect = question.answers[selectedAnswerIndex].text === correctAnswer;
     setShowExplanation(true);
-
+  
+    console.log("Submitting answer:", question.answers[selectedAnswerIndex].text, "Correct:", wasCorrect);
+  
     setTimeout(() => {
       setShowExplanation(false);
       setSubmitted(false);
       onNext(wasCorrect);
     }, 2000);
   };
+  
+  
 
   return (
     <div className="bg-white rounded-md flex flex-col items-center">

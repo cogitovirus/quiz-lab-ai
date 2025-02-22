@@ -29,24 +29,14 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
 
   useEffect(() => {
     if (!isActive) return;
-
+  
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp") {
         setSelectedAnswerIndex((prev) => (prev === null ? 0 : Math.max(prev - 1, 0)));
       } else if (event.key === "ArrowDown") {
-        setSelectedAnswerIndex((prev) => (prev === null ? 0 : Math.min(prev + 1, questions[currentQuestionIndex].answers.length - 1)));
-      } else if (event.key === "Enter") {
-        // Submit the answer
-        const currentQuestion = questions[currentQuestionIndex];
-        const correctAnswer = currentQuestion.answers.find(
-          (answer: { isCorrect: boolean }) => answer.isCorrect
-        )?.text;
-        const wasCorrect = currentQuestion.answers[selectedAnswerIndex || 0].text === correctAnswer;
-        setScore((prev) => (wasCorrect ? prev + 1 : prev));
-        setCurrentQuestionIndex((prev) =>
-          prev < questions.length - 1 ? prev + 1 : prev
+        setSelectedAnswerIndex((prev) =>
+          prev === null ? 0 : Math.min(prev + 1, questions[currentQuestionIndex].answers.length - 1)
         );
-        setSelectedAnswerIndex(null);
       } else if (
         (event.ctrlKey || event.metaKey) &&
         event.shiftKey &&
@@ -56,12 +46,13 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
         handleRedo();
       }
     };
-
+  
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isActive, questions, currentQuestionIndex, selectedAnswerIndex, setCurrentQuestionIndex, setScore, handleRedo]);
+  
 
   useEffect(() => {
   }, [quizStarted, isLoading, currentQuestionIndex, isFinished, score]);
