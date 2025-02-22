@@ -1,5 +1,6 @@
 import React from 'react';
 import PrimaryButton from '../ui/PrimaryButton';
+import SecondaryButton from '../ui/SecondaryButton';
 
 interface QuizControlsProps {
   prompt: string;
@@ -40,12 +41,11 @@ export default function QuizControls({
       <div className="flex items-center justify-between gap-2">
         <PrimaryButton onClick={onGenerate}>Generate</PrimaryButton>
         <div className="flex flex-col gap-2">
-          <button
+          <SecondaryButton
             onClick={onReset}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
             Reset
-          </button>
+          </SecondaryButton>
         </div>
       </div>
 

@@ -25,7 +25,9 @@ export default function RootLayout({
       <body className={`${inter.className} bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col`}>
         <QuizProvider>
           <Header />
-          <main className="flex-grow flex flex-col h-full">{children}</main>
+          <main className="flex-grow flex flex-col w-full">
+            {children}
+          </main>
           <Footer />
         </QuizProvider>
       </body>

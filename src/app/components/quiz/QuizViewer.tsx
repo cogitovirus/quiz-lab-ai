@@ -21,41 +21,34 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
 
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
 
-  const handleRedo = () => {
-    setScore(0);
-    setCurrentQuestionIndex(0);
-    setIsFinished(false);
-  };
-
   useEffect(() => {
     if (!isActive) return;
-  
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowUp") {
         setSelectedAnswerIndex((prev) => (prev === null ? 0 : Math.max(prev - 1, 0)));
       } else if (event.key === "ArrowDown") {
-        setSelectedAnswerIndex((prev) =>
-          prev === null ? 0 : Math.min(prev + 1, questions[currentQuestionIndex].answers.length - 1)
+        setSelectedAnswerIndex((prev) => (prev === null ? 0 : Math.min(prev + 1, questions[currentQuestionIndex].answers.length - 1)));
+      } else if (event.key === "Enter") {
+        // Submit the answer
+        const currentQuestion = questions[currentQuestionIndex];
+        const correctAnswer = currentQuestion.answers.find(
+          (answer) => answer.isCorrect
+        )?.text;
+        const wasCorrect = currentQuestion.answers[selectedAnswerIndex || 0].text === correctAnswer;
+        setScore((prev) => (wasCorrect ? prev + 1 : prev));
+        setCurrentQuestionIndex((prev) =>
+          prev < questions.length - 1 ? prev + 1 : prev
         );
-      } else if (
-        (event.ctrlKey || event.metaKey) &&
-        event.shiftKey &&
-        event.key.toLowerCase() === "x"
-      ) {
-        // Ctrl/⌘ + Shift + X -> Reset quiz
-        handleRedo();
+        setSelectedAnswerIndex(null); // Reset selected answer index for the next question
       }
     };
-  
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isActive, questions, currentQuestionIndex, selectedAnswerIndex, setCurrentQuestionIndex, setScore, handleRedo]);
-  
-
-  useEffect(() => {
-  }, [quizStarted, isLoading, currentQuestionIndex, isFinished, score]);
+  }, [isActive, questions, currentQuestionIndex, selectedAnswerIndex]);
 
   const handleNext = (wasCorrect: boolean) => {
     if (wasCorrect) setScore(score + 1);
@@ -68,12 +61,17 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
     setSelectedAnswerIndex(null); // Reset selected answer index for the next question
   };
 
+  const handleRedo = () => {
+    setScore(0);
+    setCurrentQuestionIndex(0);
+    setIsFinished(false);
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-md shadow p-4 flex flex-col h-full">
+    <div className="bg-white rounded-md shadow p-4 flex flex-col h-full dark:bg-gray-800">
       {quizStarted ? (
         isLoading ? (
           <div className="flex items-center justify-center flex-grow">
-            <p className="text-gray-500 dark:text-gray-300 mt-2">Please be patient, questions are being loaded...</p>
             <Spinner />
           </div>
         ) : isFinished ? (
@@ -88,23 +86,23 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
           <div className="flex flex-col flex-grow">
             <QuestionCard
               question={questions[currentQuestionIndex]}
+              selectedAnswerIndex={selectedAnswerIndex}
               onNext={handleNext}
               currentQuestionIndex={currentQuestionIndex}
               totalQuestions={questions.length}
-              isActive={isActive}
             />
           </div>
         ) : (
           <div className="flex flex-col flex-grow items-center justify-center">
-            <p className="text-gray-500 dark:text-gray-300">No questions available.</p>
+            <p className="text-gray-500">No questions available.</p>
           </div>
         )
       ) : (
         <div className="flex flex-col flex-grow">
           <div className="flex-grow flex items-center justify-center">
-            <p className="text-gray-500 dark:text-gray-300">Enter the topic to generate questions.</p>
+            <p className="text-gray-500">Enter the topic to generate questions.</p>
           </div>
-          <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-300">
+          <div className="mt-4 p-4 bg-gray-100 rounded-md text-sm text-gray-700">
             <h4 className="font-bold mb-2">Tips:</h4>
             <ul className="list-disc list-inside space-y-1">
               <li>Use clear and specific topics (e.g., &quot;Blob storage in Azure&quot;).</li>

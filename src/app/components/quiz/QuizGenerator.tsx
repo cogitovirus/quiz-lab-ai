@@ -95,10 +95,10 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
         onDifficultyChange={setDifficulty}
         inputRef={inputRef}
       />
-
+      <div className="mt-4 flex-grow"></div>
       <div className="mt-4">
         <ShortcutHints />
       </div>
     </div>
   );
-};
+}
