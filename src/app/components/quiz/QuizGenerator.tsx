@@ -18,29 +18,30 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
   const [difficulty, setDifficulty] = useState('easy');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Memoized handleGenerate to prevent unnecessary re-renders
   const handleGenerate = useCallback(async () => {
     if (!prompt) return;
-  
+
     setQuizStarted(true);
     setIsLoading(true);
     setIsFinished(false);
     setScore(0);
-    setQuestions([]); // clear previous data
+    setQuestions([]); // Clear previous data
     setCurrentQuestionIndex(0);
-  
+
     const config = { prompt, numQuestions, difficulty };
     const response = await fetch('/api/quiz/generate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(config),
     });
+
     const generatedQuestions = await response.json();
     setQuestions(generatedQuestions);
     setIsLoading(false);
   }, [prompt, numQuestions, difficulty, setQuizStarted, setIsLoading, setIsFinished, setScore, setQuestions, setCurrentQuestionIndex]);
-  
+
+  // Memoized handleReset to prevent re-renders
   const handleReset = useCallback(() => {
     setQuizStarted(true);
     setIsLoading(false);
@@ -48,18 +49,17 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
     setScore(0);
     setCurrentQuestionIndex(0);
   }, [setQuizStarted, setIsLoading, setIsFinished, setScore, setCurrentQuestionIndex]);
-  
 
   useEffect(() => {
     if (isActive && inputRef.current) {
       inputRef.current.focus();
     }
-  
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isActive) return;
-  
+
       const isCtrlOrMeta = event.ctrlKey || event.metaKey;
-  
+
       if (isCtrlOrMeta && event.key === 'ArrowLeft') {
         setNumQuestions((prev) => Math.max(prev - 1, 1));
       } else if (isCtrlOrMeta && event.key === 'ArrowRight') {
@@ -71,17 +71,17 @@ export default function QuizGenerator({ isActive }: { isActive: boolean }) {
       } else if (isCtrlOrMeta && event.shiftKey && event.key.toLowerCase() === 'x') {
         handleReset();
       } else if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent form submission
         handleGenerate();
       }
     };
-  
+
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isActive, handleGenerate, handleReset, setNumQuestions, setDifficulty]);
-  
-  
+  }, [isActive, handleGenerate, handleReset]);
+
   return (
     <div className="bg-white rounded-md shadow p-4 flex flex-col h-full justify-between">
       <QuizControls

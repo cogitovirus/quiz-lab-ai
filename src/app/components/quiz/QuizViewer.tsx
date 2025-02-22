@@ -82,6 +82,7 @@ export default function QuizViewer({ isActive }: { isActive: boolean }) {
       {quizStarted ? (
         isLoading ? (
           <div className="flex items-center justify-center flex-grow">
+            <p className="text-gray-500 mt-2">Please be patient, questions are being loaded...</p>
             <Spinner />
           </div>
         ) : isFinished ? (
