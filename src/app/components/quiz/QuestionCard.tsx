@@ -1,46 +1,59 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { QuizQuestion } from "../../lib/types/quiz";
 import PrimaryButton from "../ui/PrimaryButton";
 
 interface QuestionCardProps {
-  question: QuizQuestion;
+  question: QuizQuestion | undefined;
   onNext: (wasCorrect: boolean) => void;
   isActive: boolean;
   currentQuestionIndex: number;
   totalQuestions: number;
 }
 
-export default function QuestionCard({
+const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   onNext,
   isActive,
   currentQuestionIndex,
   totalQuestions,
-}: QuestionCardProps) {
+}) => {
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [showExplanation, setShowExplanation] = useState(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [showExplanation, setShowExplanation] = useState<boolean>(false);
+
+  const handleSubmit = useCallback(() => {
+    if (selectedAnswerIndex === null || submitted) return;
+    setSubmitted(true);
+    setShowExplanation(true);
+  }, [selectedAnswerIndex, submitted]);
+
+  const handleNextQuestion = useCallback(() => {
+    if (!submitted || !question) return;
+    setShowExplanation(false);
+    setSubmitted(false);
+    onNext(question.answers?.[selectedAnswerIndex!]?.isCorrect ?? false);
+  }, [submitted, onNext, question, selectedAnswerIndex]);
 
   useEffect(() => {
     if (!isActive) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowUp") {
-        setSelectedAnswerIndex((prev) =>
-          prev === null ? 0 : Math.max(prev - 1, 0)
-        );
-      } else if (event.key === "ArrowDown") {
-        setSelectedAnswerIndex((prev) =>
-          prev === null ? 0 : Math.min(prev + 1, question.answers.length - 1)
-        );
-      } else if (event.key === "Enter") {
-        if (!submitted) {
-          handleSubmit();
-        } else {
-          handleNextQuestion();
+      if (!question?.answers) return;
+
+      setSelectedAnswerIndex((prev) => {
+        if (event.key === "ArrowUp") {
+          return prev !== null ? Math.max(prev - 1, 0) : 0;
         }
+        if (event.key === "ArrowDown") {
+          return prev !== null ? Math.min(prev + 1, question.answers.length - 1) : 0;
+        }
+        return prev;
+      });
+
+      if (event.key === "Enter") {
+        submitted ? handleNextQuestion() : handleSubmit();
       }
     };
 
@@ -48,7 +61,7 @@ export default function QuestionCard({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isActive, selectedAnswerIndex, submitted]);
+  }, [isActive, submitted, handleNextQuestion, handleSubmit, question]);
 
   useEffect(() => {
     setSelectedAnswerIndex(null);
@@ -56,28 +69,22 @@ export default function QuestionCard({
     setShowExplanation(false);
   }, [currentQuestionIndex]);
 
-  const handleSubmit = () => {
-    if (selectedAnswerIndex === null || submitted) return;
-
-    setSubmitted(true);
-    setShowExplanation(true);
-  };
-
-  const handleNextQuestion = () => {
-    if (!submitted) return;
-    setShowExplanation(false);
-    setSubmitted(false);
-    onNext(question.answers[selectedAnswerIndex!].isCorrect);
-  };
+  if (!question) {
+    return (
+      <div className="flex items-center justify-center p-6">
+        <p className="text-gray-500 dark:text-gray-300">Loading question...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl flex flex-col w-full max-w-2xl mx-auto p-6">
       <h2 className="text-gray-900 dark:text-gray-100 text-xl font-semibold mb-6 text-center">
-        {question.question}
+        {question?.question ?? "Loading question..."}
       </h2>
 
       <ul className="space-y-3">
-        {question.answers.map((answer, i) => (
+        {question.answers?.map((answer, i) => (
           <li
             key={i}
             className={`p-3 rounded-lg cursor-pointer transition-all duration-200 flex items-center
@@ -107,14 +114,8 @@ export default function QuestionCard({
               <span className="ml-2">{answer.text}</span>
             </label>
           </li>
-        ))}
+        )) ?? []}
       </ul>
-
-      {showExplanation && (
-        <p className="text-gray-700 dark:text-gray-300 mt-6 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
-          <strong>Explanation:</strong> {question.explanation}
-        </p>
-      )}
 
       <div className="flex justify-center mt-6">
         <PrimaryButton
@@ -129,6 +130,13 @@ export default function QuestionCard({
       <p className="text-gray-500 dark:text-gray-400 mt-6 text-center">
         Question {currentQuestionIndex + 1} of {totalQuestions}
       </p>
+      {showExplanation && (
+        <p className="text-gray-700 dark:text-gray-300 mt-6 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
+          <strong>Explanation:</strong> {question.explanation ?? "No explanation provided."}
+        </p>
+      )}
     </div>
   );
-}
+};
+
+export default QuestionCard;

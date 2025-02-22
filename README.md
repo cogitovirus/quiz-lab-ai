@@ -1,30 +1,37 @@
-# quiz-lab-ai
+# 🧠 Quiz Lab AI  
 
-AI-powered quiz generator for studying and exam preparation. Built with Next.js and gpt-4o-mini. Generate personalised practice questions to enhance your study experience.
+**AI-powered quiz generator** for studying and exam preparation. Generate **ABCD multiple-choice questions** on **any topic, in any language** with AI.  
 
-[Status: In developemnt]
+![Quiz Lab AI Screenshot](images/screenshot.png)  
 
-Tech Stack:
+**Powered by Next.js and GPT-4o-mini.**  
 
-- Next.js + TypeScript
-- gpt-4o-mini API
 
-Features:
+## Features  
 
-- Dynamic quiz generation
-- Custom difficulty levels
-- Topic-focused question sets
+✅ **Dynamic Quiz Generation** – Create quizzes on any topic.  
+✅ **Custom Difficulty Levels** – Adjust question difficulty to suit your learning needs.  
+✅ **Custom Number of Questions** – Choose how many questions you want.  
+✅ **Supports Multiple Languages** – Generate quizzes in any language.  
 
 ## Getting Started
 
-First, run the development server:
+### Install dependencies
+
+ ```bash
+ npm install
+ ```
+
+### Set Up Environment Variables
+ 
+ - Rename env.local.example to env.local
+ - Add your OpenAI API key inside .env.local
+
+### Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+
+## License
+MIT License – Free to use and modify.

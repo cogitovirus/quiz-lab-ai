@@ -43,7 +43,7 @@ const QuizResultCard: React.FC<QuizResultCardProps> = ({ score, total, onRedo })
 
         {/* Score Message */}
         <p className="text-gray-700 dark:text-gray-300 text-lg mt-2">
-          {percentage >= 70 ? "🎆 Amazing! You crushed it! 🎆" : "😢 Try again, you'll get there!"}
+          {percentage >= 70 ? "Amazing! You crushed it! 🎆" : "😢 Try again, you'll get there!"}
         </p>
 
         {/* Reset Button */}
